@@ -1,0 +1,70 @@
+def read_lists_from_file(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        # Extract lists of numbers from lines
+        lists = [[float(num) for num in line.strip('[]\n').split(',')] for line in lines]
+    return lists
+
+def calculate_avg_list(lists):
+    max_len = max(len(lst) for lst in lists)
+    avg_list = []
+
+    for i in range(max_len):
+        total = 0
+        count = 0
+        for lst in lists:
+            if i < len(lst):
+                total += lst[i]
+                count += 1
+        if count > 0:
+            avg_list.append(round(total / count))  # Round the average value to the nearest whole number
+    
+    return avg_list
+
+def check_parsimony(filename):
+    lists = read_lists_from_file(filename)
+    parsimony = True
+
+    for i, value in enumerate(calculate_avg_list(lists)):
+        if abs(value - i) > 20:
+            parsimony = False
+            index = i
+
+            print("Escape from parsimony at time", i, "when the distance is", value)
+            return False, index
+
+    print("Parsimony forever holds")
+    return True, None
+
+def main():
+    filename = input("Enter the name of the file: ").strip()
+    parsimony, index = check_parsimony(filename)
+    if not parsimony:
+        print("Parsimony fails at index:", index)
+    else:
+        print("Parsimony holds forever.")
+
+    # Print the average list
+    lists = read_lists_from_file(filename)
+    avg_list = calculate_avg_list(lists)
+    print("Average list:", avg_list)
+
+    # Find the max value and its index in the average list
+    max_value = max(avg_list)
+    max_index = avg_list.index(max_value)
+    print("Max value in the average list:", max_value)
+    print("Index of max value:", max_index)
+
+    # Check if average list is bound to parsimony
+    avg_parsimony = True
+    for i, value in enumerate(avg_list):
+        if abs(value - i) > 20:
+            avg_parsimony = False
+            break
+    if avg_parsimony:
+        print("Average list is bound to parsimony.")
+    else:
+        print("Average list is not bound to parsimony.")
+
+if __name__ == "__main__":
+    main()
